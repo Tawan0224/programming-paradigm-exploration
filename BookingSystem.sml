@@ -50,3 +50,22 @@ val sys2 = cancelSlot 2 sys1
 val _ = showSystem sys2 0
 *)
 
+(*
+- val sys0 = initSystem 3;
+- showSystem sys0 0;
+[0] FREE
+[1] FREE
+[2] FREE
+
+- val sys1 = bookSlot 1 "Alice" sys0;
+- showSystem sys1 0;
+[0] FREE
+[1] BOOKED by Alice
+[2] FREE
+
+- val sys2 = cancelSlot 1 sys1;
+- showSystem sys2 0;
+[0] FREE
+[1] FREE
+[2] FREE
+*)
