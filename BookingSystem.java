@@ -1,144 +1,74 @@
-import java.util.*;
+import java.util.Scanner;
 
 public class BookingSystem {
-    private final String[] slots;
-
+    private String[] slots;
+    
+    //Create a booking system with specified number of slots
     public BookingSystem(int size) {
-        if (size <= 0) throw new IllegalArgumentException("size must be positive");
         slots = new String[size];
     }
-
-    // Book a slot if it is free
-    public boolean book(int index, String name) {
-        checkIndex(index);
+    
+    //Book a slot for a person
+    public void book(int index, String name) {
         if (slots[index] == null) {
             slots[index] = name;
-            return true;
+            System.out.println("Booked!");
         } else {
-            return false;
+            System.out.println("Already booked!");
         }
     }
 
-    // Cancel a booking
-    public boolean cancel(int index) {
-        checkIndex(index);
+    //Cancel a booking and make slot free
+    public void cancel(int index) {
         if (slots[index] != null) {
-            slots[index] = null;
-            return true;
+            slots[index] = null; 
+            System.out.println("Canceled!");
         } else {
-            return false;
+            System.out.println("Already free!");
         }
     }
 
-    // Display slot status
+    //Display all slots and their status
     public void show() {
-        System.out.println("Slots:");
         for (int i = 0; i < slots.length; i++) {
-            String s = (slots[i] == null) ? "FREE" : ("BOOKED by " + slots[i]);
-            System.out.printf("  [%d] %s%n", i, s);
-        }
-    }
-
-    private void checkIndex(int idx) {
-        if (idx < 0 || idx >= slots.length) {
-            throw new IndexOutOfBoundsException("Index out of range: " + idx);
-        }
-    }
-
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-
-        System.out.print("Number of slots to create: ");
-        int n;
-        try {
-            n = Integer.parseInt(sc.nextLine().trim());
-        } catch (Exception e) {
-            System.out.println("Invalid number. Defaulting to 5.");
-            n = 5;
-        }
-
-        BookingSystem system = new BookingSystem(n);
-        System.out.println("Commands: show | book <index> <name> | cancel <index> | exit");
-
-        while (true) {
-            System.out.print("> ");
-            String line = sc.nextLine().trim();
-            if (line.isEmpty()) continue;
-            String[] parts = splitArgs(line);
-            String cmd = parts[0].toLowerCase(Locale.ROOT);
-
-            try {
-                switch (cmd) {
-                    case "show":
-                        system.show();
-                        break;
-                    case "book":
-                        if (parts.length < 3) {
-                            System.out.println("Usage: book <index> <name>");
-                            break;
-                        }
-                        int idx = Integer.parseInt(parts[1]);
-                        // join remaining as name
-                        String name = join(parts, 2);
-                        boolean ok = system.book(idx, name);
-                        System.out.println(ok ? "Booked." : "Slot already booked.");
-                        break;
-                    case "cancel":
-                        if (parts.length != 2) {
-                            System.out.println("Usage: cancel <index>");
-                            break;
-                        }
-                        int cidx = Integer.parseInt(parts[1]);
-                        boolean canceled = system.cancel(cidx);
-                        System.out.println(canceled ? "Canceled." : "Slot already free.");
-                        break;
-                    case "exit":
-                    case "quit":
-                        System.out.println("Bye.");
-                        sc.close();
-                        return;
-                    default:
-                        System.out.println("Unknown command.");
-                }
-            } catch (IndexOutOfBoundsException ex) {
-                System.out.println("Error: " + ex.getMessage());
-            } catch (NumberFormatException ex) {
-                System.out.println("Invalid index number.");
-            } catch (Exception ex) {
-                System.out.println("An error occurred: " + ex.getMessage());
+            if (slots[i] == null) {
+                System.out.println(i + ": FREE");
+            } else {
+                System.out.println(i + ": " + slots[i]);
             }
         }
     }
-
-    private static String[] splitArgs(String line) {
-        return line.trim().split("\\s+");
-    }
-
-    private static String join(String[] parts, int start) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = start; i < parts.length; i++) {
-            if (i > start) sb.append(' ');
-            sb.append(parts[i]);
+    
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        
+        // Ask user for number of slots
+        System.out.print("How many slots do you want? ");
+        int numSlots = sc.nextInt();
+        
+        // Create booking system with user-specified slots
+        BookingSystem booking = new BookingSystem(numSlots);
+        
+        System.out.println("Created " + numSlots + " slots (0 to " + (numSlots-1) + ")");
+        System.out.println("Commands: show, book, cancel, exit");
+        
+        while (true) {
+            System.out.print("> ");
+            String cmd = sc.next();
+            
+            if (cmd.equals("show")) {
+                booking.show();
+            } else if (cmd.equals("book")) {
+                int index = sc.nextInt();
+                String name = sc.next();
+                booking.book(index, name);
+            } else if (cmd.equals("cancel")) {
+                int index = sc.nextInt();
+                booking.cancel(index);
+            } else if (cmd.equals("exit")) {
+                break;
+            }
         }
-        return sb.toString();
+        sc.close();
     }
 }
-
-
-
-
-/**
- * Simple Booking System (Java)
- * - Slots are indexed from 0 .. n-1
- * - Each slot can be free (null) or booked with a customer name (String)
- *
- * Run:
- *   javac BookingSystem.java
- *   java BookingSystem
- *
- * Commands in the console:
- *   show
- *   book <index> <name>
- *   cancel <index>
- *   exit
- */
