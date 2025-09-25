@@ -72,3 +72,35 @@ public class BookingSystem {
         sc.close();
     }
 }
+
+
+/*
+ * javac BookingSystem.java
+ * java BookingSystem
+ * 
+ * Example Interaction:
+ * How many slots do you want? 3
+ * Created 3 slots (0 to 2)
+ * Commands: show, book, cancel, exit
+ * 
+ * > show
+ * 0: FREE
+ * 1: FREE
+ * 2: FREE
+ * 
+ * > book 1 Trump
+ * Booked!
+ * 
+ * > show
+ * 0: FREE
+ * 1: Trump
+ * 2: FREE
+ * 
+ * > cancel 1
+ * Canceled!
+ * > show
+ * 0: FREE
+ * 1: FREE
+ * 2: FREE
+ * > exit
+ */
