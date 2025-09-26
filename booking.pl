@@ -1,78 +1,69 @@
-% Simple Booking System (Prolog)
-% slot(Index, Value).
-% Value is free or Name (an atom)
-%
-% ?- [booking].
-% ?- init_slots(5).
-% ?- show_slots.
-% ?- book(2, 'alice').
-% ?- cancel(2).
-% ?- book(0, bob).
-% ?- show_slots.
-%
-% Commands implemented:
-%   init_slots(N).   initialize N slots
-%   show_slots.      prints all slots
-%   book(I, Name).   book slot I with Name
-%   cancel(I).       cancel booking at I
-%
+% Simple Booking System for Beginners
+% How to use:
+% 1. Start SWI-Prolog and load this file: ?- [booking].
+% 2. Create slots: ?- make(3).
+% 3. Show slots: ?- show.
+% 4. Book slot: ?- book(0, alice).
+% 5. Free slot: ?- free(0).
 
 :- dynamic slot/2.
 
-%% init_slots(N) - initialize N slots to free (indices 0..N-1)
-init_slots(N) :-
-    integer(N), N > 0,
-    retractall(slot(_, _)),
-    init_slots_loop(0, N).
+% Create N empty slots (0, 1, 2, ...)
+make(N) :-
+    retractall(slot(_, _)),    % Clear old slots
+    make_slots(0, N),          % Create new slots
+    format('Made ~w slots~n', [N]).
 
-init_slots_loop(I, N) :-
-    ( I < N ->
-        assertz(slot(I, free)),
-        I1 is I + 1,
-        init_slots_loop(I1, N)
-    ; true ).
-
-%% show_slots 
-show_slots :-
-    findall(I-Value, slot(I, Value), Pairs),
-    sort(Pairs, Sorted),
-    writeln('Slots:'),
-    forall(member(I-V, Sorted),
-           ( format('  [~w] ', [I]),
-             (V = free -> writeln('FREE') ; format('BOOKED by ~w~n', [V])) )).
-
-%% book(Index, Name) 
-book(I, Name) :-
-    integer(I),
-    slot(I, free),
+% Helper to create slots from 0 to N-1
+make_slots(I, N) :-
+    I < N,
     !,
-    retract(slot(I, free)),
-    assertz(slot(I, Name)),
-    format('Booked slot ~w by ~w.~n', [I, Name]).
-book(I, _Name) :-
-    ( slot(I, _) -> writeln('Slot already booked.') ; writeln('Index out of range.'), fail ).
+    assertz(slot(I, empty)),   % Create empty slot
+    I1 is I + 1,
+    make_slots(I1, N).
+make_slots(_, _).              % Stop when I >= N
 
-%% cancel(Index) 
-cancel(I) :-
-    integer(I),
-    slot(I, Val),
-    Val \= free,
+% Show all slots in order
+show :-
+    findall(I, slot(I, _), SlotNumbers),     % Get all slot numbers
+    sort(SlotNumbers, Sorted),               % Sort just the numbers
+    forall(member(I, Sorted),                % For each slot in order
+           (slot(I, Status),                 % Get its status
+            format('~w: ', [I]),
+            (Status = empty -> 
+                writeln('EMPTY') ; 
+                writeln(Status)))).
+
+% Book a slot with a name
+book(SlotNum, Name) :-
+    slot(SlotNum, empty),      % Check if slot is empty
     !,
-    retract(slot(I, Val)),
-    assertz(slot(I, free)),
-    format('Canceled slot ~w (was booked by ~w).~n', [I, Val]).
-cancel(I) :-
-    ( slot(I, free) -> writeln('Slot already free.'), fail ; writeln('Index out of range.'), fail ).
+    retract(slot(SlotNum, empty)),     % Remove empty status
+    assertz(slot(SlotNum, Name)),      % Add name
+    format('Slot ~w booked for ~w~n', [SlotNum, Name]).
 
-%% book_cmd and cancel_cmd to parse strings from user 
-book_cmd(Str) :-
-    split_string(Str, " ", "", [Istr|Rest]),
-    number_string(I, Istr),
-    atomic_list_concat(Rest, ' ', NameStr),
-    atom_string(Name, NameStr),
-    ( book(I, Name) -> true ; true ).
+book(SlotNum, _) :-
+    slot(SlotNum, Name),       % Slot exists but not empty
+    Name \= empty,
+    !,
+    format('Slot ~w already taken by ~w~n', [SlotNum, Name]).
 
-cancel_cmd(Str) :-
-    split_string(Str, " ", "", [Istr|_]),
-    number_string(I, Istr),
-    ( cancel(I) -> true ; true ).
+book(SlotNum, _) :-            % Slot doesn't exist
+    format('Slot ~w does not exist~n', [SlotNum]).
+
+% Free a slot
+free(SlotNum) :-
+    slot(SlotNum, Name),       % Check if slot exists
+    Name \= empty,             % And is not already empty
+    !,
+    retract(slot(SlotNum, Name)),      % Remove name
+    assertz(slot(SlotNum, empty)),     % Make empty
+    format('Slot ~w is now free~n', [SlotNum]).
+
+free(SlotNum) :-
+    slot(SlotNum, empty),      % Already empty
+    !,
+    format('Slot ~w is already empty~n', [SlotNum]).
+
+free(SlotNum) :-               % Doesn't exist
+    format('Slot ~w does not exist~n', [SlotNum]).

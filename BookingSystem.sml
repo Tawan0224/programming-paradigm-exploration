@@ -1,71 +1,36 @@
-(* Booking System in Standard ML *)
+(* Simple Booking System in ML *)
 
 datatype slot = Free | Booked of string
-type system = slot list
 
-(* Initialize N slots as Free *)
-fun initSystem 0 = []
-  | initSystem n = Free :: initSystem (n-1)
+(* Create n free slots *)
+fun makeSlots 0 = []
+  | makeSlots n = Free :: makeSlots (n-1)
 
-(* Show system state *)
-fun showSystem [] _ = ()
-  | showSystem (Free::rest) idx =
-      (print ("[" ^ Int.toString idx ^ "] FREE\n");
-       showSystem rest (idx+1))
-  | showSystem (Booked name::rest) idx =
-      (print ("[" ^ Int.toString idx ^ "] BOOKED by " ^ name ^ "\n");
-       showSystem rest (idx+1))
+(* Show all slots *)
+fun show [] _ = ()
+  | show (Free::rest) i = 
+      (print (Int.toString i ^ ": FREE\n"); show rest (i+1))
+  | show (Booked name::rest) i = 
+      (print (Int.toString i ^ ": " ^ name ^ "\n"); show rest (i+1))
 
-(* Book a slot *)
-fun bookSlot idx name sys =
-  let
-    fun helper [] _ = []
-      | helper (Free::rest) 0 = Booked name :: rest
-      | helper (Booked x::rest) 0 = Booked x :: rest
-      | helper (x::rest) i = x :: helper rest (i-1)
-  in
-    helper sys idx
-  end
+(* Book slot at index *)
+fun book [] _ _ = []
+  | book (Free::rest) 0 name = Booked name :: rest
+  | book (slot::rest) 0 name = slot :: rest
+  | book (slot::rest) i name = slot :: book rest (i-1) name
 
-(* Cancel a slot *)
-fun cancelSlot idx sys =
-  let
-    fun helper [] _ = []
-      | helper (Booked x::rest) 0 = Free :: rest
-      | helper (Free::rest) 0 = Free :: rest
-      | helper (x::rest) i = x :: helper rest (i-1)
-  in
-    helper sys idx
-  end
+(* Cancel slot at index *)
+fun cancel [] _ = []
+  | cancel (Booked _::rest) 0 = Free :: rest
+  | cancel (slot::rest) 0 = slot :: rest
+  | cancel (slot::rest) i = slot :: cancel rest (i-1)
 
-(* Demo run *)
-(*
-val sys0 = initSystem 5
-val _ = showSystem sys0 0
+(* Example usage *)
+(* val slots = makeSlots 3;
+show slots 0;
 
-val sys1 = bookSlot 2 "Alice" sys0
-val _ = showSystem sys1 0
+val slots1 = book slots 1 "Alice";
+show slots1 0;
 
-val sys2 = cancelSlot 2 sys1
-val _ = showSystem sys2 0
-*)
-
-(*
-- val sys0 = initSystem 3;
-- showSystem sys0 0;
-[0] FREE
-[1] FREE
-[2] FREE
-
-- val sys1 = bookSlot 1 "Alice" sys0;
-- showSystem sys1 0;
-[0] FREE
-[1] BOOKED by Alice
-[2] FREE
-
-- val sys2 = cancelSlot 1 sys1;
-- showSystem sys2 0;
-[0] FREE
-[1] FREE
-[2] FREE
-*)
+val slots2 = cancel slots1 1;
+show slots2 0; *)
