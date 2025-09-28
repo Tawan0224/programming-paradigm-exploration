@@ -1,11 +1,3 @@
-% Simple Booking System for Beginners
-% How to use:
-% 1. Start SWI-Prolog and load this file: ?- [booking].
-% 2. Create slots: ?- make(3).
-% 3. Show slots: ?- show.
-% 4. Book slot: ?- book(0, alice).
-% 5. Free slot: ?- free(0).
-
 :- dynamic slot/2.
 
 % Create N empty slots (0, 1, 2, ...)
@@ -67,3 +59,13 @@ free(SlotNum) :-
 
 free(SlotNum) :-               % Doesn't exist
     format('Slot ~w does not exist~n', [SlotNum]).
+
+
+% Simple Booking System for Beginners
+% How to use:
+% 1. Start SWI-Prolog and load this file: ?- [booking].
+% 2. Create slots: ?- make(3).
+% 3. Show slots: ?- show.
+% 4. Book slot: ?- book(0, lucas).
+% 5. Free slot: ?- free(0).
+

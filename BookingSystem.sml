@@ -1,5 +1,3 @@
-(* Simple Booking System in ML *)
-
 datatype slot = Free | Booked of string
 
 (* Create n free slots *)
@@ -29,7 +27,7 @@ fun cancel [] _ = []
 (* val slots = makeSlots 3;
 show slots 0;
 
-val slots1 = book slots 1 "Alice";
+val slots1 = book slots 1 "Tawan";
 show slots1 0;
 
 val slots2 = cancel slots1 1;

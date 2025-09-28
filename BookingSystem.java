@@ -78,7 +78,7 @@ public class BookingSystem {
  * javac BookingSystem.java
  * java BookingSystem
  * 
- * Example Interaction:
+ * Example Usage:
  * How many slots do you want? 3
  * Created 3 slots (0 to 2)
  * Commands: show, book, cancel, exit
